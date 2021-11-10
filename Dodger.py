@@ -12,8 +12,8 @@ def select_file_template_doc():
     Функция для выбора файла шаблона
     :return: Путь к файлу шаблона
     """
-    global name_file_template_contracts
-    name_file_template_contracts = filedialog.askopenfilename(
+    global name_file_template_doc
+    name_file_template_doc = filedialog.askopenfilename(
         filetypes=(('Word files', '*.docx'), ('all files', '*.*')))
 
 def select_file_data_doc():
@@ -21,17 +21,17 @@ def select_file_data_doc():
     Функция для выбора файла с данными на основе которых будет генерироваться документ
     :return: Путь к файлу с данными
     """
-    global name_file_data_contracts
+    global name_file_data_doc
     # Получаем путь к файлу
-    name_file_data_contracts = filedialog.askopenfilename(filetypes=(('Csv files', '*.csv'), ('all files', '*.*')))
+    name_file_data_doc = filedialog.askopenfilename(filetypes=(('Csv files', '*.csv'), ('all files', '*.*')))
 
 def select_end_folder_doc():
     """
     Функция для выбора папки куда будут генерироваться файлы
     :return:
     """
-    global path_to_end_folder_contracts
-    path_to_end_folder_contracts = filedialog.askdirectory()
+    global path_to_end_folder_doc
+    path_to_end_folder_doc = filedialog.askdirectory()
 
 def generate_docs():
     """
@@ -40,17 +40,19 @@ def generate_docs():
     """
     try:
         # Считываем csv файл, не забывая что екселевский csv разделен на самомо деле не запятыми а точкой с запятой
-        reader = csv.DictReader(open(name_file_data_contracts), delimiter=';')
+        reader = csv.DictReader(open(name_file_data_doc), delimiter=';')
         # Конвертируем объект reader в список словарей
         data = list(reader)
         # Создаем в цикле документы
         for row in data:
-            doc = DocxTemplate(name_file_template_contracts)
+            doc = DocxTemplate(name_file_template_doc)
             context = row
             # Превращаем строку в список кортежей, где первый элемент кортежа это ключ а второй данные
             id_row = list(row.items())
             doc.render(context)
-            doc.save(f'{id_row[0][1]}.docx')
+            print(context)
+            print(id_row[0][1])
+            doc.save(f'{path_to_end_folder_doc}/{id_row[0][1]}.docx')
         messagebox.showinfo('Dodger', 'Создание документов успешно завершено!')
     except NameError as e:
         messagebox.showinfo('Dodger', f'Выберите шаблон,файл с данными и папку куда будут генерироваться файлы')
@@ -75,11 +77,12 @@ if __name__ == '__main__':
     lbl_hello = Label(tab_create_doc, text='Генерация документов по шаблону')
     lbl_hello.grid(column=0, row=0, padx=10, pady=25)
 
-    #Картинка
-    img = PhotoImage(file='logo.png')
-    Label(tab_create_doc,
-        image=img
-    ).grid(column=0, row=1, padx=10, pady=25)
+    # #Картинка
+    # img = PhotoImage(file='logo.png')
+    # Label(tab_create_doc,
+    #     image=img
+    # ).grid(column=0, row=1, padx=10, pady=25)
+
     # Создаем кнопку Выбрать шаблон
     btn_template_contract = Button(tab_create_doc, text='1) Выберите шаблон документа', font=('Arial Bold', 20),
                                    command=select_file_template_doc
